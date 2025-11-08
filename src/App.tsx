@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import UpdateStatus from "./pages/UpdateStatus";
+import CRChatPage from "./pages/CRChatPage";
+import Timetable from "./pages/Timetable";
 import NotFound from "./pages/NotFound";
 import Decorations from "./components/Decorations";
 
@@ -22,6 +25,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/update-status" element={<UpdateStatus />} />
+          <Route path="/cr-chat" element={<CRChatPage />} />
+          <Route path="/timetable" element={<Timetable />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -19,7 +19,7 @@ const CRPanel = ({ userBranch, userId }: Props) => {
   const [className, setClassName] = useState("");
   const [subject, setSubject] = useState("");
   const [purpose, setPurpose] = useState("");
-  const [status, setStatus] = useState<"occupied" | "reserved">("occupied");
+  const [status, setStatus] = useState<"vacant" | "occupied" | "reserved">("occupied");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +44,28 @@ const CRPanel = ({ userBranch, userId }: Props) => {
     setIsSubmitting(true);
 
     try {
+      // First, delete any existing occupancy for this classroom that overlaps
+      const { error: deleteError } = await supabase
+        .from("classroom_occupancy")
+        .delete()
+        .eq("classroom_id", selectedClassroom)
+        .gte("end_time", new Date().toISOString());
+
+      if (deleteError) throw deleteError;
+
+      // If status is vacant, we're done - no need to insert
+      if (status === "vacant") {
+        toast.success("Classroom marked as vacant!");
+        setClassName("");
+        setSubject("");
+        setPurpose("");
+        setStartTime("");
+        setEndTime("");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Insert new occupancy for occupied or reserved
       const { error } = await supabase.from("classroom_occupancy").insert({
         classroom_id: selectedClassroom,
         branch: userBranch,
@@ -99,75 +121,80 @@ const CRPanel = ({ userBranch, userId }: Props) => {
 
         <div>
           <Label htmlFor="status">Status</Label>
-          <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+          <Select value={status} onValueChange={(value: any) => setStatus(value)} required>
             <SelectTrigger className="glass">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="vacant">Vacant</SelectItem>
               <SelectItem value="occupied">Occupied</SelectItem>
               <SelectItem value="reserved">Reserved</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div>
-          <Label htmlFor="className">Class Name</Label>
-          <Input
-            id="className"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            placeholder="e.g., ECE 3rd Year"
-            className="glass"
-            required
-          />
-        </div>
+        {status !== "vacant" && (
+          <>
+            <div>
+              <Label htmlFor="className">Class Name</Label>
+              <Input
+                id="className"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                placeholder="e.g., ECE 3rd Year"
+                className="glass"
+                required
+              />
+            </div>
 
-        <div>
-          <Label htmlFor="subject">Subject</Label>
-          <Input
-            id="subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g., Signals & Systems"
-            className="glass"
-          />
-        </div>
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="e.g., Signals & Systems"
+                className="glass"
+              />
+            </div>
 
-        <div>
-          <Label htmlFor="purpose">Purpose (for reserved)</Label>
-          <Input
-            id="purpose"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
-            placeholder="e.g., OA/Interview"
-            className="glass"
-          />
-        </div>
+            <div>
+              <Label htmlFor="purpose">Purpose (for reserved)</Label>
+              <Input
+                id="purpose"
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                placeholder="e.g., OA/Interview"
+                className="glass"
+              />
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="startTime">Start Time</Label>
-            <Input
-              id="startTime"
-              type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="glass"
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="endTime">End Time</Label>
-            <Input
-              id="endTime"
-              type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="glass"
-              required
-            />
-          </div>
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input
+                  id="startTime"
+                  type="datetime-local"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="glass"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="endTime">End Time</Label>
+                <Input
+                  id="endTime"
+                  type="datetime-local"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="glass"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         <Button type="submit" className="w-full hover-glow" disabled={isSubmitting}>
           <Plus className="w-4 h-4 mr-2" />

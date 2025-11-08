@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
-import ClassroomGrid from "@/components/ClassroomGrid";
 import Navbar from "@/components/Navbar";
+import { Card } from "@/components/ui/card";
+import { Calendar } from "lucide-react";
 
-const Dashboard = () => {
+const Timetable = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -46,6 +47,9 @@ const Dashboard = () => {
 
     if (data) {
       setProfile(data);
+      if (data.role !== "cr") {
+        navigate("/dashboard");
+      }
     }
   };
 
@@ -68,12 +72,16 @@ const Dashboard = () => {
         userBranch={profile.branch}
       />
       <main className="container mx-auto px-4 py-8">
-        <div className="animate-fade-in">
-          <ClassroomGrid userRole={profile.role} userBranch={profile.branch} />
-        </div>
+        <Card className="glass p-8 text-center">
+          <Calendar className="w-16 h-16 mx-auto mb-4 text-primary" />
+          <h2 className="text-2xl font-bold gradient-text mb-2">Timetable Manager</h2>
+          <p className="text-muted-foreground">
+            Timetable management features coming soon...
+          </p>
+        </Card>
       </main>
     </div>
   );
 };
 
-export default Dashboard;
+export default Timetable;

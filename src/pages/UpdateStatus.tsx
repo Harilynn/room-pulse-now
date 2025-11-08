@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
-import ClassroomGrid from "@/components/ClassroomGrid";
 import Navbar from "@/components/Navbar";
+import CRPanel from "@/components/CRPanel";
 
-const Dashboard = () => {
+const UpdateStatus = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -46,6 +46,9 @@ const Dashboard = () => {
 
     if (data) {
       setProfile(data);
+      if (data.role !== "cr") {
+        navigate("/dashboard");
+      }
     }
   };
 
@@ -68,12 +71,12 @@ const Dashboard = () => {
         userBranch={profile.branch}
       />
       <main className="container mx-auto px-4 py-8">
-        <div className="animate-fade-in">
-          <ClassroomGrid userRole={profile.role} userBranch={profile.branch} />
+        <div className="max-w-2xl mx-auto">
+          <CRPanel userBranch={profile.branch} userId={user.id} />
         </div>
       </main>
     </div>
   );
 };
 
-export default Dashboard;
+export default UpdateStatus;

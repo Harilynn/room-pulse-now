@@ -109,14 +109,14 @@ const CRChat = ({ userBranch, userId, userName }: Props) => {
   };
 
   return (
-    <Card className="glass p-6 hover-lift flex flex-col h-[600px]">
+    <Card className="glass p-4 sm:p-6 hover-lift flex flex-col h-[calc(100vh-12rem)]">
       <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-bold gradient-text">CR Chat</h2>
+        <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <h2 className="text-xl sm:text-2xl font-bold gradient-text">CR Chat</h2>
       </div>
 
-      <ScrollArea className="flex-1 pr-4 mb-4">
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 pr-2 sm:pr-4 mb-4">
+        <div className="space-y-3 sm:space-y-4">
           {messages.map((msg) => {
             const isOwn = msg.sender_id === userId;
             return (
@@ -125,7 +125,7 @@ const CRChat = ({ userBranch, userId, userName }: Props) => {
                 className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 py-2 sm:px-4 sm:py-2 ${
                     isOwn
                       ? "bg-primary text-primary-foreground"
                       : "glass"
@@ -136,7 +136,7 @@ const CRChat = ({ userBranch, userId, userName }: Props) => {
                       {msg.sender?.name || "Unknown"} • {msg.sender_branch}
                     </p>
                   )}
-                  <p className="break-words">{msg.message}</p>
+                  <p className="break-words text-sm sm:text-base">{msg.message}</p>
                   <p
                     className={`text-xs mt-1 ${
                       isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
@@ -157,10 +157,10 @@ const CRChat = ({ userBranch, userId, userName }: Props) => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
-          className="glass flex-1"
+          className="glass flex-1 text-sm sm:text-base"
           disabled={isSending}
         />
-        <Button type="submit" disabled={isSending || !newMessage.trim()} className="hover-glow">
+        <Button type="submit" disabled={isSending || !newMessage.trim()} className="hover-glow" size="sm">
           <Send className="w-4 h-4" />
         </Button>
       </form>
