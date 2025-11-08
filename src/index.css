@@ -119,7 +119,9 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     background: linear-gradient(135deg, hsl(var(--gradient-start)) 0%, hsl(var(--gradient-mid)) 50%, hsl(var(--gradient-end)) 100%);
+    background-size: 200% 200%;
     background-attachment: fixed;
+    animation: gradientShift 25s ease-in-out infinite alternate;
   }
 }
 
@@ -142,5 +144,61 @@ All colors MUST be HSL.
   
   .hover-lift {
     @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl;
+  }
+  /* Decorations: bubbles and glitters for subtle UI polish */
+  .decorations {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 40; /* above app content but below toasts which use higher z */
+    will-change: transform, opacity;
+  }
+
+  .decorations .bubble {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), rgba(255,255,255,0.05));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    opacity: 0.8;
+    animation-name: floatUp;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+
+  .decorations .glitter {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0.2));
+    transform: rotate(20deg);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+    animation-name: shimmer;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    will-change: transform, opacity;
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(30vh) translateX(0) scale(0.85); opacity: 0 }
+    20% { opacity: 0.75 }
+    50% { transform: translateY(10vh) translateX(6vw) scale(1); opacity: 0.95 }
+    80% { opacity: 0.6 }
+    100% { transform: translateY(-20vh) translateX(-4vw) scale(1.05); opacity: 0 }
+  }
+
+  @keyframes shimmer {
+    0% { opacity: 0; transform: scale(0.6) translateX(-6px) rotate(10deg) }
+    40% { opacity: 1; transform: scale(1.2) translateX(0) rotate(20deg) }
+    100% { opacity: 0; transform: scale(0.6) translateX(6px) rotate(30deg) }
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 }
