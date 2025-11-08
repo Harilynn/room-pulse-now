@@ -34,12 +34,13 @@ const Auth = () => {
     try {
       // If CR role, verify code first
       if (role === "cr") {
+        const normalizedCode = crCode.trim();
         const { data: codeData, error: codeError } = await supabase
           .from("cr_codes")
           .select("*")
           .eq("branch", branch)
-          .eq("code", crCode)
-          .single();
+          .eq("code", normalizedCode)
+          .maybeSingle();
 
         if (codeError || !codeData) {
           toast.error("Invalid CR code for selected branch");
