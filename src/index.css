@@ -201,4 +201,16 @@ All colors MUST be HSL.
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+
+  /* Subtle gradient overlay for surfaces using theme tokens */
+  .card-gradient {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--gradient-start) / 0.08),
+      hsl(var(--gradient-mid) / 0.06),
+      hsl(var(--gradient-end) / 0.08)
+    );
+    background-blend-mode: normal;
+  }
 }
+
