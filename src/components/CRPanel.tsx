@@ -44,14 +44,14 @@ const CRPanel = ({ userBranch, userId }: Props) => {
     setIsSubmitting(true);
 
     try {
-      // First, delete any existing occupancy for this classroom that overlaps
-      const { error: deleteError } = await supabase
+      // First, end any existing occupancy for this classroom that's ongoing/future
+      const { error: updateError } = await supabase
         .from("classroom_occupancy")
-        .delete()
+        .update({ end_time: new Date().toISOString() })
         .eq("classroom_id", selectedClassroom)
         .gte("end_time", new Date().toISOString());
 
-      if (deleteError) throw deleteError;
+      if (updateError) throw updateError;
 
       // If status is vacant, we're done - no need to insert
       if (status === "vacant") {

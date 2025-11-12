@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
-
+import TimetableCSVImport from "@/components/timetable/TimetableCSVImport";
+import TimetableForm from "@/components/timetable/TimetableForm";
 const Timetable = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
@@ -71,14 +72,16 @@ const Timetable = () => {
         userRole={profile.role}
         userBranch={profile.branch}
       />
-      <main className="container mx-auto px-4 py-8">
-        <Card className="glass p-8 text-center">
+      <main className="container mx-auto px-4 py-8 space-y-6">
+        <div className="text-center">
           <Calendar className="w-16 h-16 mx-auto mb-4 text-primary" />
           <h2 className="text-2xl font-bold gradient-text mb-2">Timetable Manager</h2>
-          <p className="text-muted-foreground">
-            Timetable management features coming soon...
-          </p>
-        </Card>
+          <p className="text-muted-foreground">Upload CSV or add weekly slots. Sync today's timetable to occupancy.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TimetableCSVImport userBranch={profile.branch} />
+          <TimetableForm userBranch={profile.branch} userId={user.id} />
+        </div>
       </main>
     </div>
   );
