@@ -44,6 +44,12 @@ const CRPanel = ({ userBranch, userId }: Props) => {
     setIsSubmitting(true);
 
     try {
+      if (!selectedClassroom) {
+        toast.error("Please select a classroom");
+        setIsSubmitting(false);
+        return;
+      }
+
       // First, end any existing occupancy for this classroom that's ongoing/future
       const { error: updateError } = await supabase
         .from("classroom_occupancy")
@@ -65,6 +71,16 @@ const CRPanel = ({ userBranch, userId }: Props) => {
         return;
       }
 
+      // Normalize times to UTC ISO strings to avoid timezone mismatches
+      const startIso = new Date(startTime).toISOString();
+      const endIso = new Date(endTime).toISOString();
+
+      if (new Date(endIso) <= new Date(startIso)) {
+        toast.error("End time must be after start time");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Insert new occupancy for occupied or reserved
       const { error } = await supabase.from("classroom_occupancy").insert({
         classroom_id: selectedClassroom,
@@ -73,8 +89,8 @@ const CRPanel = ({ userBranch, userId }: Props) => {
         subject: subject || null,
         occupied_by: userId,
         status,
-        start_time: startTime,
-        end_time: endTime,
+        start_time: startIso,
+        end_time: endIso,
         purpose: purpose || null,
       });
 
