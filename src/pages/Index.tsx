@@ -40,28 +40,40 @@ const Index = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass rounded-2xl p-6 hover-lift hover-glow">
+          <div 
+            onClick={() => navigate("/dashboard")}
+            className="glass rounded-2xl p-6 hover-lift hover-glow cursor-pointer transition-all"
+          >
             <Calendar className="w-10 h-10 text-primary mb-4 mx-auto" />
             <h3 className="font-bold text-lg mb-2">Real-Time Updates</h3>
             <p className="text-sm text-muted-foreground">
               Instant updates on classroom availability and schedules
             </p>
           </div>
-          <div className="glass rounded-2xl p-6 hover-lift hover-glow">
+          <div 
+            onClick={() => navigate("/auth")}
+            className="glass rounded-2xl p-6 hover-lift hover-glow cursor-pointer transition-all"
+          >
             <Users className="w-10 h-10 text-secondary mb-4 mx-auto" />
             <h3 className="font-bold text-lg mb-2">CR Verification</h3>
             <p className="text-sm text-muted-foreground">
               Secure access control with branch-specific CR codes
             </p>
           </div>
-          <div className="glass rounded-2xl p-6 hover-lift hover-glow">
+          <div 
+            onClick={() => navigate("/cr-chat")}
+            className="glass rounded-2xl p-6 hover-lift hover-glow cursor-pointer transition-all"
+          >
             <MessageSquare className="w-10 h-10 text-accent mb-4 mx-auto" />
             <h3 className="font-bold text-lg mb-2">CR Chat Lobby</h3>
             <p className="text-sm text-muted-foreground">
               Communicate across branches for better coordination
             </p>
           </div>
-          <div className="glass rounded-2xl p-6 hover-lift hover-glow">
+          <div 
+            onClick={() => navigate("/timetable")}
+            className="glass rounded-2xl p-6 hover-lift hover-glow cursor-pointer transition-all"
+          >
             <Clock className="w-10 h-10 text-primary mb-4 mx-auto" />
             <h3 className="font-bold text-lg mb-2">Auto Management</h3>
             <p className="text-sm text-muted-foreground">

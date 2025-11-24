@@ -20,27 +20,42 @@ interface Classroom {
 
 const allowedBranches = ["CSE", "ECE", "IT", "MECH", "CIVIL", "EEE"] as const;
 
-const rowSchema = z.object({
-  day_of_week: z.coerce.number().int().min(0).max(6),
-  start_time: z.string().regex(/^\d{2}:\d{2}$/),
-  end_time: z.string().regex(/^\d{2}:\d{2}$/),
-  room: z.string().min(1),
-  branch: z.enum(allowedBranches),
-  class_name: z.string().min(1),
-  subject: z.string().min(1),
-});
-
-type Row = z.infer<typeof rowSchema>;
-
-type PreviewRow = Row & {
+type ParsedSlot = {
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  room: string;
+  class_name: string;
+  subject: string;
   valid: boolean;
   errors: string[];
   classroom_id?: string;
 };
 
+const dayMap: Record<string, number> = {
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+  sunday: 0,
+};
+
+const timeSlotMap: Record<string, { start: string; end: string }> = {
+  "1": { start: "09:00", end: "10:00" },
+  "2": { start: "10:00", end: "11:00" },
+  "3": { start: "11:00", end: "12:00" },
+  "4": { start: "12:00", end: "13:00" },
+  "5": { start: "13:00", end: "14:00" },
+  "6": { start: "14:00", end: "15:00" },
+  "7": { start: "15:00", end: "16:00" },
+  "8": { start: "16:00", end: "17:00" },
+};
+
 const TimetableCSVImport = ({ userBranch }: Props) => {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [rows, setRows] = useState<PreviewRow[]>([]);
+  const [rows, setRows] = useState<ParsedSlot[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -69,55 +84,70 @@ const TimetableCSVImport = ({ userBranch }: Props) => {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        const parsed = (results.data as any[]).map((raw) => {
-          // Normalize keys and trim
-          const obj: any = {};
-          Object.keys(raw || {}).forEach((k) => {
-            obj[k.trim()] = typeof raw[k] === "string" ? String(raw[k]).trim() : raw[k];
-          });
+        const allSlots: ParsedSlot[] = [];
+        const rawData = results.data as any[];
 
-          const validation = rowSchema.safeParse(obj);
-          let preview: PreviewRow;
-          if (!validation.success) {
-            preview = {
-              ...(obj as Row),
-              valid: false,
-              errors: validation.error.issues.map((i) => i.message),
-            } as PreviewRow;
-          } else {
-            const v = validation.data;
-            const errs: string[] = [];
+        // Process each row (day)
+        rawData.forEach((row: any) => {
+          const dayName = row["Days"]?.toLowerCase().trim();
+          const dayNum = dayMap[dayName];
 
-            // Branch must match the CR's branch
-            if (v.branch !== userBranch) {
-              errs.push(`Branch mismatch: ${v.branch} (expected ${userBranch})`);
+          if (dayNum === undefined) return;
+
+          // Process each time slot column
+          Object.keys(row).forEach((col) => {
+            if (col === "Days" || !row[col] || row[col].trim() === "") return;
+
+            // Extract slot number from column like "1 (9-10 am)"
+            const slotMatch = col.match(/^(\d+)/);
+            if (!slotMatch) return;
+
+            const slotNum = slotMatch[1];
+            const timeSlot = timeSlotMap[slotNum];
+            if (!timeSlot) return;
+
+            // Parse subject and room from cell
+            const cellValue = row[col].trim();
+            const roomMatch = cellValue.match(/\(([^)]+)\)/);
+            const room = roomMatch ? roomMatch[1].trim() : "";
+            const subject = cellValue.replace(/\([^)]+\)/g, "").trim();
+
+            if (!subject) return;
+
+            const errors: string[] = [];
+            const roomKey = room.toLowerCase();
+            const cid = roomMap.get(roomKey);
+
+            if (!cid && room) {
+              errors.push(`Unknown room: ${room}`);
             }
 
-            // Room must exist
-            const cid = roomMap.get(v.room.trim().toLowerCase());
-            if (!cid) errs.push(`Unknown room: ${v.room}`);
-
-            // Time order
-            if (v.start_time >= v.end_time) {
-              errs.push("start_time must be before end_time");
-            }
-
-            preview = {
-              ...v,
+            allSlots.push({
+              day_of_week: dayNum,
+              start_time: timeSlot.start,
+              end_time: timeSlot.end,
+              room: room || "No Room",
+              class_name: "Default Class",
+              subject: subject,
               classroom_id: cid,
-              valid: errs.length === 0,
-              errors: errs,
-            };
-          }
-          return preview;
+              valid: errors.length === 0 && !!cid,
+              errors,
+            });
+          });
         });
-        setRows(parsed);
+
+        setRows(allSlots);
+        if (allSlots.length === 0) {
+          toast.error("No valid slots found in CSV");
+        } else {
+          toast.success(`Parsed ${allSlots.length} slots`);
+        }
       },
       error: () => toast.error("Failed to parse CSV"),
     });
   };
 
-  const validRows = rows.filter((r) => r.valid && r.classroom_id);
+  const validRows = rows.filter((r) => r.valid && r.classroom_id) as ParsedSlot[];
   const hasErrors = rows.some((r) => !r.valid);
 
   const handleImport = async () => {
@@ -150,7 +180,9 @@ const TimetableCSVImport = ({ userBranch }: Props) => {
     <Card className="glass p-6 hover-lift">
       <div className="mb-4">
         <h3 className="text-xl font-bold gradient-text">CSV Import</h3>
-        <p className="text-sm text-muted-foreground">Columns: day_of_week,start_time,end_time,room,branch,class_name,subject</p>
+        <p className="text-sm text-muted-foreground">
+          Format: Days column + time slots (1-8) with subjects. Room in parentheses: "Subject (Room)"
+        </p>
       </div>
 
       <div className="space-y-3">

@@ -187,7 +187,24 @@ const CRPanel = ({ userBranch, userId }: Props) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startTime">Start Time</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="startTime">Start Time</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const now = new Date();
+                      const formatted = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                        .toISOString()
+                        .slice(0, 16);
+                      setStartTime(formatted);
+                    }}
+                    className="text-xs h-6 px-2"
+                  >
+                    Now
+                  </Button>
+                </div>
                 <Input
                   id="startTime"
                   type="datetime-local"
@@ -198,7 +215,43 @@ const CRPanel = ({ userBranch, userId }: Props) => {
                 />
               </div>
               <div>
-                <Label htmlFor="endTime">End Time</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="endTime">End Time</Label>
+                  <div className="flex gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const start = startTime ? new Date(startTime) : new Date();
+                        const end = new Date(start.getTime() + 60 * 60 * 1000);
+                        const formatted = new Date(end.getTime() - end.getTimezoneOffset() * 60000)
+                          .toISOString()
+                          .slice(0, 16);
+                        setEndTime(formatted);
+                      }}
+                      className="text-xs h-6 px-2"
+                    >
+                      +1h
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const start = startTime ? new Date(startTime) : new Date();
+                        const end = new Date(start.getTime() + 120 * 60 * 1000);
+                        const formatted = new Date(end.getTime() - end.getTimezoneOffset() * 60000)
+                          .toISOString()
+                          .slice(0, 16);
+                        setEndTime(formatted);
+                      }}
+                      className="text-xs h-6 px-2"
+                    >
+                      +2h
+                    </Button>
+                  </div>
+                </div>
                 <Input
                   id="endTime"
                   type="datetime-local"

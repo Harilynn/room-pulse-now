@@ -187,6 +187,33 @@ export type Database = {
         }
         Relationships: []
       }
+      room_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          requester_branch: Database["public"]["Enums"]["branch_type"]
+          requester_id: string
+          requester_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          requester_branch: Database["public"]["Enums"]["branch_type"]
+          requester_id: string
+          requester_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          requester_branch?: Database["public"]["Enums"]["branch_type"]
+          requester_id?: string
+          requester_name?: string
+        }
+        Relationships: []
+      }
       timetable: {
         Row: {
           branch: Database["public"]["Enums"]["branch_type"]
