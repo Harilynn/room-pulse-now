@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 import ClassroomGrid from "@/components/ClassroomGrid";
 import Navbar from "@/components/Navbar";
+import RoomRequestNotification from "@/components/notifications/RoomRequestNotification";
+import RoomRequestDialog from "@/components/notifications/RoomRequestDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -68,10 +70,18 @@ const Dashboard = () => {
         userBranch={profile.branch}
       />
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6 flex justify-end">
+          <RoomRequestDialog
+            userName={profile.name}
+            userBranch={profile.branch}
+            userId={user.id}
+          />
+        </div>
         <div className="animate-fade-in">
           <ClassroomGrid userRole={profile.role} userBranch={profile.branch} />
         </div>
       </main>
+      <RoomRequestNotification userBranch={profile.branch} userId={user.id} />
     </div>
   );
 };
