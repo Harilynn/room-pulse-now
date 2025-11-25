@@ -98,7 +98,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl font-bold gradient-text">ClassTrack</h1>
+            <h1 className="text-4xl font-bold gradient-text">CampusFlow</h1>
           </div>
           <p className="text-muted-foreground">Real-time classroom management</p>
         </div>

@@ -11,7 +11,7 @@ const Index = () => {
         <div className="glass rounded-3xl p-12 hover-lift">
           <div className="flex items-center justify-center gap-3 mb-6">
             <Sparkles className="w-12 h-12 text-primary" />
-            <h1 className="text-6xl font-bold gradient-text">ClassTrack</h1>
+            <h1 className="text-6xl font-bold gradient-text">CampusFlow</h1>
           </div>
           <p className="text-2xl text-foreground mb-8">
             Real-Time Classroom Management System
